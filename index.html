@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Puzzle rush by maddy</title>
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
     <meta
       name="viewport"
@@ -14,8 +15,6 @@
       <v-app>
         <v-main>
           <v-app-bar>
-            <v-toolbar-title>Puzzle rush</v-toolbar-title>
-
             <v-spacer></v-spacer>
             <v-toolbar-title> Score: {{score}} </v-toolbar-title>
             <v-spacer></v-spacer>
@@ -83,7 +82,7 @@
             colors: ['#ff595e ', '#ffca3a ', '#8ac926 ', '#1982c4 ', '#6a4c93'],
           };
         },
-        mounted() {
+        created() {
           this.pushData();
           setInterval(() => {
             this.pushData();
