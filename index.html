@@ -113,7 +113,7 @@
             }
           },
           getItem(row, col) {
-            return this.data[col] && this.data[col][this.box - 1 - row];
+            return this.data[col] && this.data[col][this.rows - 1 - row];
           },
           getNeighbors(row, col) {
             // 4,4
