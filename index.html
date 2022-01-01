@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+
+    <link href="./index.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app">
+      <v-app>
+        <v-main>
+          <v-app-bar>
+            <v-toolbar-title>Puzzle rush</v-toolbar-title>
+
+            <v-spacer></v-spacer>
+            <v-toolbar-title> Score: {{score}} </v-toolbar-title>
+            <v-spacer></v-spacer>
+          </v-app-bar>
+
+          <v-container>
+            <v-row justify="center" no-gutters>
+              <v-col cols="12" lg="7" :class="{face: count}">
+                <v-row dense justify="center" v-for="(row, rowIndex) in box" :key="rowIndex">
+                  <v-col cols="1" v-for="(col, colIndex) in box" :key="colIndex">
+                    <v-responsive :aspect-ratio="1">
+                      <v-btn
+                        :key="key"
+                        depressed
+                        block
+                        height="100%"
+                        :color="`${getItem(rowIndex, colIndex)}`"
+                        @click="onClick(colIndex, box - 1 - rowIndex)"
+                      >
+                      </v-btn>
+                    </v-responsive>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+
+            <v-btn fab fixed bottom right color="primary" @click="pushData()" class="text-h4">
+              +
+            </v-btn>
+          </v-container>
+
+          <v-dialog v-model="dialog" width="500">
+            <v-card>
+              <v-card-title class="text-h4 justify-center"> Game over </v-card-title>
+
+              <v-card-actions class="justify-center">
+                <v-btn color="primary" text @click="dialog = false"> Try again </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-main>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <script>
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify({
+          theme: {
+            dark: false,
+          },
+        }),
+        data: () => {
+          return {
+            key: 0,
+            box: 12,
+            score: 0,
+            count: 0,
+            dialog: false,
+            data: [],
+            colors: ['#ff595e ', '#ffca3a ', '#8ac926 ', '#1982c4 ', '#6a4c93'],
+          };
+        },
+        mounted() {
+          this.pushData();
+          setInterval(() => {
+            this.pushData();
+          }, 3000);
+        },
+        methods: {
+          pushData() {
+            if (this.data.every((row) => row.length < this.box)) {
+              this.count = 0;
+              for (let index = 0; index < this.box; index++) {
+                this.data[index] = this.data[index] || [];
+                this.data[index].unshift(this.colors[_.random(3)]);
+              }
+              this.key++;
+            } else {
+              this.count++;
+              if (this.count > 3) {
+                this.data = [];
+                this.score = 0;
+                this.count = 0;
+                this.dialog = true;
+              }
+            }
+          },
+          getItem(row, col) {
+            return this.data[col] && this.data[col][this.box - 1 - row];
+          },
+          getNeighbors(row, col) {
+            // 4,4
+            const array = [];
+
+            // 5,4
+            if (this.data[row + 1] && this.data[row + 1][col]) {
+              array.push({
+                row: row + 1,
+                col: col,
+                value: this.data[row + 1][col],
+              });
+            }
+
+            // 4,5
+            if (this.data[row] && this.data[row][col + 1]) {
+              array.push({
+                row: row,
+                col: col + 1,
+                value: this.data[row][col + 1],
+              });
+            }
+
+            // 4,3
+            if (this.data[row] && this.data[row][col - 1]) {
+              array.push({
+                row: row,
+                col: col - 1,
+                value: this.data[row][col - 1],
+              });
+            }
+
+            // 3,4
+            if (this.data[row - 1] && this.data[row - 1][col]) {
+              array.push({
+                row: row - 1,
+                col: col,
+                value: this.data[row - 1][col],
+              });
+            }
+
+            return array;
+          },
+          rGetMatched(row, col, value, object = {}) {
+            if (!object[`${row}x${col}`]) {
+              object[`${row}x${col}`] = true;
+
+              const neighbors = this.getNeighbors(row, col);
+
+              neighbors.forEach((neighbor) => {
+                if (neighbor.value == value) {
+                  this.rGetMatched(neighbor.row, neighbor.col, value, object);
+                }
+              });
+
+              const keys = Object.keys(object);
+              if (keys.length > 2) {
+                return _.orderBy(keys, [], 'desc').map((x) => x.split('x'));
+              }
+            }
+          },
+          onClick(row, col) {
+            const value = this.data[row][col];
+
+            const matched = this.rGetMatched(row, col, value);
+            if (matched) {
+              this.score += matched.length;
+              matched.forEach(([_row, _col]) => {
+                this.data[_row].splice(_col, 1);
+
+                if (!this.data[_row].length) {
+                  this.data.splice(_row, 1);
+                }
+
+                this.key++;
+              });
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
