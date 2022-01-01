@@ -24,7 +24,7 @@
             <v-row justify="center" no-gutters>
               <v-col cols="12" lg="7" :class="{face: count}">
                 <v-row dense justify="center" v-for="(row, rowIndex) in rows" :key="rowIndex">
-                  <v-col cols="1" v-for="(col, colIndex) in cols" :key="colIndex">
+                  <v-col cols="2" sm="1" v-for="(col, colIndex) in cols" :key="colIndex">
                     <v-responsive :aspect-ratio="1">
                       <v-btn
                         :key="key"
@@ -85,7 +85,7 @@
         },
         created() {
           if (this.$vuetify.breakpoint.xs) {
-            this.cols = 8;
+            this.cols = 6;
 
           }
           this.pushData();
