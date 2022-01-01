@@ -23,8 +23,8 @@
           <v-container>
             <v-row justify="center" no-gutters>
               <v-col cols="12" lg="7" :class="{face: count}">
-                <v-row dense justify="center" v-for="(row, rowIndex) in box" :key="rowIndex">
-                  <v-col cols="1" v-for="(col, colIndex) in box" :key="colIndex">
+                <v-row dense justify="center" v-for="(row, rowIndex) in rows" :key="rowIndex">
+                  <v-col cols="1" v-for="(col, colIndex) in cols" :key="colIndex">
                     <v-responsive :aspect-ratio="1">
                       <v-btn
                         :key="key"
@@ -32,7 +32,7 @@
                         block
                         height="100%"
                         :color="`${getItem(rowIndex, colIndex)}`"
-                        @click="onClick(colIndex, box - 1 - rowIndex)"
+                        @click="onClick(colIndex, rows - 1 - rowIndex)"
                       >
                       </v-btn>
                     </v-responsive>
@@ -74,7 +74,8 @@
         data: () => {
           return {
             key: 0,
-            box: 12,
+            rows: 12,
+            cols:12,
             score: 0,
             count: 0,
             dialog: false,
@@ -83,6 +84,10 @@
           };
         },
         created() {
+          if(this.$vuetify.breakpoint.xs){
+          this.rows=8;
+
+          }
           this.pushData();
           setInterval(() => {
             this.pushData();
@@ -90,9 +95,9 @@
         },
         methods: {
           pushData() {
-            if (this.data.every((row) => row.length < this.box)) {
+            if (this.data.every((row) => row.length < this.rows)) {
               this.count = 0;
-              for (let index = 0; index < this.box; index++) {
+              for (let index = 0; index < this.cols; index++) {
                 this.data[index] = this.data[index] || [];
                 this.data[index].unshift(this.colors[_.random(3)]);
               }
