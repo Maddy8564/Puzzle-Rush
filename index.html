@@ -32,13 +32,13 @@
                         block
                         height="100%"
                         class="white--text pa-0"
-                        :color="`${getItem(colIndex, rows - 1 - rowIndex, 'color')}`"
+                        :color="`${getValue(colIndex, rows - 1 - rowIndex, 'color')}`"
                         @click="onClick(colIndex, rows - 1 - rowIndex)"
                       >
-                        <template v-if="getItem(colIndex, rows - 1 - rowIndex, 'multiplier') > 1">
+                        <template v-if="getValue(colIndex, rows - 1 - rowIndex, 'multiplier') > 1">
                           x
                           <span class="text-h5 font-weight-bold">
-                            {{getItem(colIndex, rows - 1 - rowIndex, 'multiplier')}}
+                            {{getValue(colIndex, rows - 1 - rowIndex, 'multiplier')}}
                           </span>
                         </template>
                       </v-btn>
@@ -139,7 +139,7 @@
               }
             }
           },
-          getItem(row, col, key) {
+          getValue(row, col, key) {
             return this.data[row] && this.data[row][col] && this.data[row][col][key];
           },
           getNeighbors(row, col) {
