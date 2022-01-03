@@ -110,9 +110,11 @@
 
             this.dialog = false;
           },
+
           pushData() {
             if (this.data.every((row) => row.length < this.rows)) {
               this.count = 0;
+
               for (let index = 0; index < this.cols; index++) {
                 this.data[index] = this.data[index] || [];
 
@@ -131,6 +133,7 @@
               this.key++;
             } else {
               this.count++;
+
               if (this.count > 2) {
                 this.data = [];
                 this.count = 0;
@@ -139,9 +142,11 @@
               }
             }
           },
+
           getValue(row, col, key) {
             return this.data[row] && this.data[row][col] && this.data[row][col][key];
           },
+
           getNeighbors(row, col) {
             // 4,4
             const array = [];
@@ -184,6 +189,7 @@
 
             return array;
           },
+
           rGetMatched(row, col, value, object = {}, neighbor) {
             if (!object[`${row}x${col}`]) {
               object[`${row}x${col}`] = neighbor ? neighbor.value.multiplier : value.multiplier;
@@ -205,6 +211,7 @@
               }
             }
           },
+
           onClick(row, col) {
             const value = this.data[row][col];
 
