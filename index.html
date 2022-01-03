@@ -31,9 +31,13 @@
                         depressed
                         block
                         height="100%"
-                        :color="`${getItem(rowIndex, colIndex)}`"
+                        class="text-h5 white--text font-weight-bold"
+                        :color="`${getItem(colIndex, rows - 1 - rowIndex, 'color')}`"
                         @click="onClick(colIndex, rows - 1 - rowIndex)"
                       >
+                        <span v-if="getItem(colIndex, rows - 1 - rowIndex, 'multiplier') > 1">
+                          x{{getItem(colIndex, rows - 1 - rowIndex, 'multiplier')}}
+                        </span>
                       </v-btn>
                     </v-responsive>
                   </v-col>
@@ -75,7 +79,7 @@
           return {
             key: 0,
             rows: 12,
-            cols:12,
+            cols: 12,
             score: 0,
             count: 0,
             dialog: false,
@@ -86,12 +90,16 @@
         created() {
           if (this.$vuetify.breakpoint.xs) {
             this.cols = 6;
-
           }
+
           this.pushData();
           setInterval(() => {
             this.pushData();
-          }, 3000);
+          }, 5000);
+
+          // _.times(this.rows, () => {
+          //   this.pushData();
+          // });
         },
         methods: {
           pushData() {
@@ -99,8 +107,19 @@
               this.count = 0;
               for (let index = 0; index < this.cols; index++) {
                 this.data[index] = this.data[index] || [];
-                this.data[index].unshift(this.colors[_.random(3)]);
+
+                const value = {
+                  color: this.colors[_.random(3)],
+                  multiplier: 0,
+                };
+
+                // if (index === _.random(this.cols)) {
+                //   value.multiplier = _.random(3);
+                // }
+
+                this.data[index].unshift(value);
               }
+
               this.key++;
             } else {
               this.count++;
@@ -112,8 +131,8 @@
               }
             }
           },
-          getItem(row, col) {
-            return this.data[col] && this.data[col][this.rows - 1 - row];
+          getItem(row, col, key) {
+            return this.data[row] && this.data[row][col] && this.data[row][col][key];
           },
           getNeighbors(row, col) {
             // 4,4
@@ -164,7 +183,7 @@
               const neighbors = this.getNeighbors(row, col);
 
               neighbors.forEach((neighbor) => {
-                if (neighbor.value == value) {
+                if (neighbor.value.color == value.color) {
                   this.rGetMatched(neighbor.row, neighbor.col, value, object);
                 }
               });
@@ -178,18 +197,22 @@
           onClick(row, col) {
             const value = this.data[row][col];
 
-            const matched = this.rGetMatched(row, col, value);
-            if (matched) {
-              this.score += matched.length;
-              matched.forEach(([_row, _col]) => {
-                this.data[_row].splice(_col, 1);
+            if (value) {
+              const matched = this.rGetMatched(row, col, value);
 
-                if (!this.data[_row].length) {
-                  this.data.splice(_row, 1);
-                }
+              if (matched) {
+                this.score += matched.length;
 
-                this.key++;
-              });
+                matched.forEach(([_row, _col]) => {
+                  this.data[_row].splice(_col, 1);
+
+                  if (!this.data[_row].length) {
+                    this.data.splice(_row, 1);
+                  }
+
+                  this.key++;
+                });
+              }
             }
           },
         },
