@@ -31,7 +31,7 @@
                         depressed
                         block
                         height="100%"
-                        class="text-h5 white--text font-weight-bold"
+                        class="text-h5 white--text font-weight-bold pa-0"
                         :color="`${getItem(colIndex, rows - 1 - rowIndex, 'color')}`"
                         @click="onClick(colIndex, rows - 1 - rowIndex)"
                       >
@@ -110,12 +110,12 @@
 
                 const value = {
                   color: this.colors[_.random(3)],
-                  multiplier: 0,
+                  multiplier: 1,
                 };
 
-                // if (index === _.random(this.cols)) {
-                //   value.multiplier = _.random(3);
-                // }
+                if (index === _.random(this.cols)) {
+                  value.multiplier = _.random(2, 4);
+                }
 
                 this.data[index].unshift(value);
               }
@@ -176,21 +176,24 @@
 
             return array;
           },
-          rGetMatched(row, col, value, object = {}) {
+          rGetMatched(row, col, value, object = {}, neighbor) {
             if (!object[`${row}x${col}`]) {
-              object[`${row}x${col}`] = true;
+              object[`${row}x${col}`] = neighbor ? neighbor.value.multiplier : value.multiplier;
 
               const neighbors = this.getNeighbors(row, col);
 
               neighbors.forEach((neighbor) => {
                 if (neighbor.value.color == value.color) {
-                  this.rGetMatched(neighbor.row, neighbor.col, value, object);
+                  this.rGetMatched(neighbor.row, neighbor.col, value, object, neighbor);
                 }
               });
 
               const keys = Object.keys(object);
               if (keys.length > 2) {
-                return _.orderBy(keys, [], 'desc').map((x) => x.split('x'));
+                return _.orderBy(keys, [], 'desc').map((key) => {
+                  const [row, col] = key.split('x');
+                  return { row, col, multiplier: object[key] };
+                });
               }
             }
           },
@@ -201,17 +204,21 @@
               const matched = this.rGetMatched(row, col, value);
 
               if (matched) {
-                this.score += matched.length;
+                let multiplier = 1;
 
-                matched.forEach(([_row, _col]) => {
-                  this.data[_row].splice(_col, 1);
+                matched.forEach((item) => {
+                  multiplier *= item.multiplier;
 
-                  if (!this.data[_row].length) {
-                    this.data.splice(_row, 1);
+                  this.data[item.row].splice(item.col, 1);
+
+                  if (!this.data[item.row].length) {
+                    this.data.splice(item.row, 1);
                   }
 
                   this.key++;
                 });
+
+                this.score += matched.length * multiplier;
               }
             }
           },
