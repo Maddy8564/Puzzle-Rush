@@ -152,11 +152,7 @@
 
             const closer = (_row, _col) => {
               if (this.data[_row] && this.data[_row][_col]) {
-                array.push({
-                  row: _row,
-                  col: _col,
-                  value: this.data[_row][_col],
-                });
+                array.push({ row: _row, col: _col, value: this.data[_row][_col] });
               }
             };
 
