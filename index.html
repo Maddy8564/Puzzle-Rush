@@ -169,15 +169,15 @@
             return array;
           },
 
-          rGetMatched(row, col, value, object = {}, neighbor) {
+          rGetMatched({ row, col, value }, object = {}) {
             if (!object[`${row}x${col}`]) {
-              object[`${row}x${col}`] = neighbor ? neighbor.value.multiplier : value.multiplier;
+              object[`${row}x${col}`] = value.multiplier;
 
               const neighbors = this.getNeighbors(row, col);
 
               neighbors.forEach((neighbor) => {
                 if (neighbor.value.color == value.color) {
-                  this.rGetMatched(neighbor.row, neighbor.col, value, object, neighbor);
+                  this.rGetMatched(neighbor, object);
                 }
               });
 
@@ -195,7 +195,7 @@
             const value = this.data[row][col];
 
             if (value) {
-              const matched = this.rGetMatched(row, col, value);
+              const matched = this.rGetMatched({ row, col, value });
 
               if (matched) {
                 let multiplier = 1;
